@@ -1,8 +1,7 @@
 {
-  "version": 2,
-  "buildCommand": "flutter build web --release --web-renderer html",
+  "buildCommand": "echo 'Build completed locally'",
   "outputDirectory": "build/web",
-  "installCommand": "if [ ! -d \"/vercel/.flutter\" ]; then git clone https://github.com/flutter/flutter.git /vercel/.flutter; fi && /vercel/.flutter/bin/flutter --version && /vercel/.flutter/bin/flutter pub get",
+  "installCommand": "echo 'No install needed'",
   "rewrites": [
     {
       "source": "/(.*)",
@@ -13,14 +12,6 @@
     {
       "source": "/(.*)",
       "headers": [
-        {
-          "key": "Cross-Origin-Embedder-Policy",
-          "value": "credentialless"
-        },
-        {
-          "key": "Cross-Origin-Opener-Policy",
-          "value": "same-origin"
-        },
         {
           "key": "Cache-Control",
           "value": "public, max-age=3600"

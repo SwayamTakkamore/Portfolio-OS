@@ -1,0 +1,28 @@
+name: portfolio_flutter
+description: A Flutter web portfolio with OS-like interface
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  provider: ^6.1.1
+  google_fonts: ^6.1.0
+  flutter_animate: ^4.5.0
+  audioplayers: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/sounds/
+    - assets/wallpapers/
+    - assets/resume-placeholder.md

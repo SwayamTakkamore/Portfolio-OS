@@ -3,10 +3,10 @@
   "buildCommand": "flutter build web --release --web-renderer html",
   "outputDirectory": "build/web",
   "installCommand": "if [ ! -d \"/vercel/.flutter\" ]; then git clone https://github.com/flutter/flutter.git /vercel/.flutter; fi && /vercel/.flutter/bin/flutter --version && /vercel/.flutter/bin/flutter pub get",
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [

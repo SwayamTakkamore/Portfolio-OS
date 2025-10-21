@@ -13,6 +13,8 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_animate: ^4.5.0
   audioplayers: ^5.2.1
+  flutter_markdown: ^0.7.4+1
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -26,3 +28,4 @@ flutter:
     - assets/sounds/
     - assets/wallpapers/
     - assets/resume-placeholder.md
+    - assets/resume/

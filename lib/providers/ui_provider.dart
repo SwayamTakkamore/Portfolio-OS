@@ -41,6 +41,15 @@ class UIProvider extends ChangeNotifier {
       width: 700,
       height: 600,
     ),
+    'file-explorer': WindowState(
+      id: 'file-explorer',
+      title: 'File Explorer',
+      icon: '📁',
+      x: 100,
+      y: 100,
+      width: 1000,
+      height: 650,
+    ),
   };
 
   Map<String, WindowState> get windows => _windows;

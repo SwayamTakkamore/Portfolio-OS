@@ -23,6 +23,7 @@ class Dock extends StatefulWidget {
 
 class _DockState extends State<Dock> {
   final List<DockItem> _dockItems = [
+    DockItem(id: 'file-explorer', icon: '📁', label: 'This PC'),
     DockItem(id: 'terminal', icon: '⌘', label: 'Terminal'),
     DockItem(id: 'about', icon: '👤', label: 'About'),
     DockItem(id: 'projects', icon: '💼', label: 'Projects'),

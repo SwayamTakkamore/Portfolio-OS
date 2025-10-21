@@ -8,7 +8,9 @@ import '../widgets/terminal_widget.dart';
 import '../widgets/about_widget.dart';
 import '../widgets/projects_widget.dart';
 import '../widgets/resume_widget.dart';
+import '../widgets/file_explorer_window.dart';
 import '../constants/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DesktopScreen extends StatefulWidget {
   const DesktopScreen({super.key});
@@ -25,6 +27,7 @@ class _DesktopScreenState extends State<DesktopScreen>
     'assets/wallpapers/voidroot-2.jpg',
   ];
   bool _isDockVisible = false;
+  bool _isWallpaperLoaded = false;
   late AnimationController _dockAnimationController;
   late Animation<Offset> _dockSlideAnimation;
 
@@ -42,6 +45,20 @@ class _DesktopScreenState extends State<DesktopScreen>
       parent: _dockAnimationController,
       curve: Curves.easeOut,
     ));
+    
+    // Precache all wallpapers
+    _precacheWallpapers();
+  }
+  
+  Future<void> _precacheWallpapers() async {
+    for (String wallpaper in _wallpapers) {
+      await precacheImage(AssetImage(wallpaper), context);
+    }
+    if (mounted) {
+      setState(() {
+        _isWallpaperLoaded = true;
+      });
+    }
   }
 
   @override
@@ -66,27 +83,106 @@ class _DesktopScreenState extends State<DesktopScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(_wallpapers[_currentWallpaper]),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.3),
-              BlendMode.darken,
+      body: Stack(
+        children: [
+          // Gradient background (shows immediately)
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF0A0E27),
+                  const Color(0xFF1a1f3a),
+                  const Color(0xFF2a1f3a),
+                ],
+              ),
             ),
           ),
-        ),
-        child: Stack(
-          children: [
+          // Wallpaper image (fades in when loaded)
+          if (_isWallpaperLoaded)
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 600),
+              opacity: _isWallpaperLoaded ? 1.0 : 0.0,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(_wallpapers[_currentWallpaper]),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.3),
+                      BlendMode.darken,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          // Loading indicator while wallpaper loads
+          if (!_isWallpaperLoaded)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: AppColors.accent,
+                    strokeWidth: 3,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Loading wallpaper...',
+                    style: GoogleFonts.jetBrainsMono(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // Top bar with blur
             Positioned(
               top: 0,
               left: 0,
               right: 0,
               child: _buildTopBar(context),
+            ),
+            // Desktop Icons (left side)
+            Positioned(
+              top: 60,
+              left: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDesktopIcon(
+                    icon: Icons.computer,
+                    label: 'This PC',
+                    onTap: () {
+                      Provider.of<UIProvider>(context, listen: false)
+                          .openWindow('file-explorer');
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDesktopIcon(
+                    icon: Icons.folder,
+                    label: 'Documents',
+                    onTap: () {
+                      // Open documents folder
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDesktopIcon(
+                    icon: Icons.delete_outline,
+                    label: 'Recycle Bin',
+                    onTap: () {
+                      // Open recycle bin
+                    },
+                  ),
+                ],
+              ),
             ),
             // Windows
             Positioned.fill(
@@ -289,6 +385,81 @@ class _DesktopScreenState extends State<DesktopScreen>
     );
   }
 
+  Widget _buildDesktopIcon({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 90,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.accent.withOpacity(0.2),
+                      AppColors.accent2.withOpacity(0.2),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.accent.withOpacity(0.3),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.accent.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: AppColors.accent,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  label,
+                  style: GoogleFonts.jetBrainsMono(
+                    color: AppColors.textPrimary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _getWindowContent(String id) {
     switch (id) {
       case 'terminal':
@@ -299,6 +470,8 @@ class _DesktopScreenState extends State<DesktopScreen>
         return const ProjectsWidget();
       case 'resume':
         return const ResumeWidget();
+      case 'file-explorer':
+        return const FileExplorerWindow();
       default:
         return const Center(child: Text('Unknown window'));
     }

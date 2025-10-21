@@ -45,11 +45,11 @@ class _DesktopScreenState extends State<DesktopScreen>
       parent: _dockAnimationController,
       curve: Curves.easeOut,
     ));
-    
+
     // Precache all wallpapers
     _precacheWallpapers();
   }
-  
+
   Future<void> _precacheWallpapers() async {
     for (String wallpaper in _wallpapers) {
       await precacheImage(AssetImage(wallpaper), context);
@@ -143,111 +143,109 @@ class _DesktopScreenState extends State<DesktopScreen>
                 ],
               ),
             ),
-            // Top bar with blur
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildTopBar(context),
+          // Top bar with blur
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: _buildTopBar(context),
+          ),
+          // Desktop Icons (left side)
+          Positioned(
+            top: 60,
+            left: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDesktopIcon(
+                  icon: Icons.computer,
+                  label: 'This PC',
+                  onTap: () {
+                    Provider.of<UIProvider>(context, listen: false)
+                        .openWindow('file-explorer');
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildDesktopIcon(
+                  icon: Icons.folder,
+                  label: 'Documents',
+                  onTap: () {
+                    // Open documents folder
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildDesktopIcon(
+                  icon: Icons.delete_outline,
+                  label: 'Recycle Bin',
+                  onTap: () {
+                    // Open recycle bin
+                  },
+                ),
+              ],
             ),
-            // Desktop Icons (left side)
-            Positioned(
-              top: 60,
-              left: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDesktopIcon(
-                    icon: Icons.computer,
-                    label: 'This PC',
-                    onTap: () {
-                      Provider.of<UIProvider>(context, listen: false)
-                          .openWindow('file-explorer');
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDesktopIcon(
-                    icon: Icons.folder,
-                    label: 'Documents',
-                    onTap: () {
-                      // Open documents folder
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDesktopIcon(
-                    icon: Icons.delete_outline,
-                    label: 'Recycle Bin',
-                    onTap: () {
-                      // Open recycle bin
-                    },
-                  ),
-                ],
-              ),
-            ),
-            // Windows
-            Positioned.fill(
-              top: 40,
-              bottom: 0, // Changed from 100 to 0 since dock auto-hides
-              child: Consumer<UIProvider>(
-                builder: (context, uiProvider, _) {
-                  final windows = uiProvider.windows.values
-                      .where((w) => w.isOpen && !w.isMinimized)
-                      .toList()
-                    ..sort((a, b) => a.zIndex.compareTo(b.zIndex));
+          ),
+          // Windows
+          Positioned.fill(
+            top: 40,
+            bottom: 0, // Changed from 100 to 0 since dock auto-hides
+            child: Consumer<UIProvider>(
+              builder: (context, uiProvider, _) {
+                final windows = uiProvider.windows.values
+                    .where((w) => w.isOpen && !w.isMinimized)
+                    .toList()
+                  ..sort((a, b) => a.zIndex.compareTo(b.zIndex));
 
-                  return Stack(
-                    children: [
-                      for (var window in windows)
-                        WindowWidget(
-                          key: Key(window.id),
-                          windowState: window,
-                          child: _getWindowContent(window.id),
-                        ),
-                    ],
-                  );
-                },
+                return Stack(
+                  children: [
+                    for (var window in windows)
+                      WindowWidget(
+                        key: Key(window.id),
+                        windowState: window,
+                        child: _getWindowContent(window.id),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+          // Dock hover trigger area (larger for better UX)
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 10, // Larger area at bottom to trigger dock
+            child: MouseRegion(
+              onEnter: (_) => _showDock(),
+              child: Container(
+                color: Colors.transparent,
               ),
             ),
-            // Dock hover trigger area (larger for better UX)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 10, // Larger area at bottom to trigger dock
+          ),
+          // Auto-hide Dock
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              ignoring: !_isDockVisible, // Make dock click-through when hidden
               child: MouseRegion(
                 onEnter: (_) => _showDock(),
-                child: Container(
-                  color: Colors.transparent,
-                ),
-              ),
-            ),
-            // Auto-hide Dock
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: IgnorePointer(
-                ignoring:
-                    !_isDockVisible, // Make dock click-through when hidden
-                child: MouseRegion(
-                  onEnter: (_) => _showDock(),
-                  onExit: (_) => _hideDock(),
-                  child: SlideTransition(
-                    position: _dockSlideAnimation,
-                    child: Dock(
-                      onWallpaperChange: () {
-                        setState(() {
-                          _currentWallpaper =
-                              (_currentWallpaper + 1) % _wallpapers.length;
-                        });
-                      },
-                    ),
+                onExit: (_) => _hideDock(),
+                child: SlideTransition(
+                  position: _dockSlideAnimation,
+                  child: Dock(
+                    onWallpaperChange: () {
+                      setState(() {
+                        _currentWallpaper =
+                            (_currentWallpaper + 1) % _wallpapers.length;
+                      });
+                    },
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

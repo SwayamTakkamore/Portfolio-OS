@@ -27,6 +27,10 @@ class _FileExplorerWindowState extends State<FileExplorerWindow> {
   void _navigateToItem(FileSystemItem item) {
     if (item is DriveItem) {
       setState(() {
+        // Reset path when navigating to a drive from sidebar
+        _navigationPath = [
+          PathItem(name: 'This PC', items: PortfolioFileSystem.drives)
+        ];
         _currentItems = item.children;
         _navigationPath.add(PathItem(name: item.name, items: item.children));
         _selectedItem = null;
@@ -85,7 +89,6 @@ class _FileExplorerWindowState extends State<FileExplorerWindow> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface.withOpacity(0.95),
-        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.accent.withOpacity(0.3),
           width: 1,
@@ -122,7 +125,6 @@ class _FileExplorerWindowState extends State<FileExplorerWindow> {
             AppColors.accent2.withOpacity(0.2),
           ],
         ),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -212,6 +214,7 @@ class _FileExplorerWindowState extends State<FileExplorerWindow> {
         borderRadius: BorderRadius.circular(6),
         child: Container(
           padding: const EdgeInsets.all(8),
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isActive
                 ? AppColors.accent.withOpacity(0.2)
@@ -223,7 +226,7 @@ class _FileExplorerWindowState extends State<FileExplorerWindow> {
           ),
           child: Icon(
             icon,
-            size: 20,
+            size: 22,
             color: onPressed == null
                 ? AppColors.textSecondary.withOpacity(0.3)
                 : isActive

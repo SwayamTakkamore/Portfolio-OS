@@ -50,6 +50,24 @@ class UIProvider extends ChangeNotifier {
       width: 1000,
       height: 650,
     ),
+    'documents': WindowState(
+      id: 'documents',
+      title: 'Documents',
+      icon: '📄',
+      x: 150,
+      y: 120,
+      width: 900,
+      height: 600,
+    ),
+    'recycle-bin': WindowState(
+      id: 'recycle-bin',
+      title: 'Recycle Bin',
+      icon: '🗑️',
+      x: 200,
+      y: 140,
+      width: 850,
+      height: 600,
+    ),
   };
 
   Map<String, WindowState> get windows => _windows;
